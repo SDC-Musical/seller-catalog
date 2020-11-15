@@ -51,8 +51,20 @@ const quotes = (req, res) => {
     .catch(() => res.status(500).send('Internal Server Error.'));
 };
 
+const addQuote = (req, res) => {
+  //to complete with db methods to add/update price and seller
+  res.sendStatus(200);
+};
+
+const deleteQuote = (req, res) => {
+  //to complete with db methods to delete price and seller
+  res.sendStatus(200);
+};
+
 module.exports = {
   prices,
   sellers,
   quotes,
+  addQuote,
+  deleteQuote
 };
