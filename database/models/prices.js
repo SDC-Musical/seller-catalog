@@ -21,7 +21,31 @@ const retrievePrices = (id) => {
     .sort({ productId: 1 });
 };
 
+const fetchPrices = (id) => {
+  return Price.find({ productId: id });
+}
+
+const addPrices = (product) => {
+  return new Price(product).save();
+}
+
+const deletePrices = (id) => {
+  return Price.deleteOne({ productId: id });
+}
+
+const updatePrices = (productId, sellerId, update) => {
+  return Price.where({productId})
+    .updateOne({'seller.id': sellerId}, {$set: {
+      'seller.$.price': update.price,
+      'seller.$.tax': update.tax
+    }});
+}
+
 module.exports = {
   Price,
   retrievePrices,
+  fetchPrices,
+  addPrices,
+  deletePrices,
+  updatePrices
 };

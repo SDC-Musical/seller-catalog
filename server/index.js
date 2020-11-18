@@ -8,6 +8,8 @@ const router = require('./routes');
 
 const app = express();
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const isProd = process.env.NODE_ENV === 'production';
 const hostname = process.env.HOST || 'localhost';
