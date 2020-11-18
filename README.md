@@ -1,13 +1,10 @@
-# Project Name
+# Buying Options
 
-> Project description
+> Catalog of buying options
 
 ## Related Projects
 
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
-  - https://github.com/teamName/repo
+  - https://github.com/SDC-Musical/proxy-server-grace
 
 ## Table of Contents
 
@@ -17,7 +14,10 @@
 
 ## Usage
 
-> Some usage instructions
+> API Routes
+  - GET /api/product/quotes
+  - POST /api/product/quotes
+  - DELETE /api/product/quotes
 
 ## Requirements
 
