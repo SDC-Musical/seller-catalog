@@ -1,21 +1,21 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-restricted-globals */
-const { retrievePrices } = require('../database/models/prices');
-const { retrieveSellers } = require('../database/models/sellers');
+const pricesModel = require('../database/models/prices');
+const sellersModel = require('../database/models/sellers');
 const { createQuotes } = require('../services/quotes');
 
 const prices = (req, res) => {
   if (req.query.productId !== undefined) {
-    retrievePrices(req.query.productId)
+    pricesModel.retrievePrices(req.query.productId)
       .then((productData) => res.send(productData));
   } else {
-    retrievePrices()
+    pricesModel.retrievePrices()
       .then((productData) => res.send(productData));
   }
 };
 
 const sellers = (req, res) => {
-  retrieveSellers()
+  sellersModel.retrieveSellers()
     .then((sellerData) => res.send(sellerData));
 };
 
@@ -32,10 +32,10 @@ const quotes = (req, res) => {
   let priceInfo;
   let sellerInfo;
 
-  retrieveSellers()
+  sellersModel.retrieveSellers()
     .then((sellerData) => {
       sellerInfo = sellerData;
-      return retrievePrices(id);
+      return pricesModel.retrievePrices(id);
     })
     .then((productData) => {
       priceInfo = productData;
@@ -51,20 +51,68 @@ const quotes = (req, res) => {
     .catch(() => res.status(500).send('Internal Server Error.'));
 };
 
-const addQuote = (req, res) => {
-  //to complete with db methods to add/update price and seller
-  res.sendStatus(200);
+const addPrices = (req, res) => {
+  pricesModel.fetchPrices(req.body.productId)
+    .then((pricesRecord) => {
+      if (pricesRecord.length === 0) {
+        pricesModel.addPrices(req.body);
+      } else {
+        throw 'Product already exists';
+      }
+    })
+    .then(() => {
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      res.status(404).send(err);
+    });
 };
 
-const deleteQuote = (req, res) => {
-  //to complete with db methods to delete price and seller
-  res.sendStatus(200);
+const addSeller = (req, res) => {
+  sellersModel.fetchSeller(req.body.id)
+    .then((sellerRecord) => {
+      if (sellerRecord.length === 0) {
+        sellersModel.addSeller(req.body);
+      } else {
+        throw 'Seller already exists';
+      }
+    })
+    .then(() => res.sendStatus(200))
+    .catch((err) => res.status(404).send(err));
+}
+
+const deletePrices = (req, res) => {
+  pricesModel.deletePrices(req.body.productId)
+    .then(() => res.sendStatus(200))
+    .catch((err) => res.status(404).send(err));
 };
+
+const deleteSeller = (req, res) => {
+  sellersModel.deleteSeller(req.body.id)
+    .then(() => res.sendStatus(200))
+    .catch((err) => res.status(400).send(err));
+}
+
+const updatePrices = (req, res) => {
+  pricesModel.updatePrices(req.body.productId, req.body.sellerId, req.body.priceUpdate)
+    .then(() => res.sendStatus(200))
+    .catch((err) => res.status(404).send(err));
+}
+
+const updateSeller = (req, res) => {
+  sellersModel.updateSeller(req.body.id, req.body.sellerUpdate)
+    .then(() => res.sendStatus(200))
+    .catch((err) => res.status(404).send(err));
+}
 
 module.exports = {
   prices,
   sellers,
   quotes,
-  addQuote,
-  deleteQuote
+  addPrices,
+  addSeller,
+  deletePrices,
+  deleteSeller,
+  updatePrices,
+  updateSeller
 };
