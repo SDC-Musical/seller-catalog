@@ -18,7 +18,7 @@
     "dev": "nodemon server/index.js",
     "start": "node server/index.js",
     "lint": "eslint . --ext .js",
-    "seed": "node database/seed.js",
+    "seed": "node --max-old-space-size=8192 database/seed.js",
     "test:server": "nyc mocha specs/server.js",
     "test:client": "jest --coverage"
   },
