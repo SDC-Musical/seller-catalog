@@ -16,8 +16,12 @@
 
 > API Routes
   - GET /api/product/quotes
-  - POST /api/product/quotes
-  - DELETE /api/product/quotes
+  - POST /api/product/prices
+  - POST /api/product/sellers
+  - PUT /api/product/prices
+  - PUT /api/product/sellers
+  - DELETE /api/product/prices
+  - DELETE /api/product/sellers
 
 ## Requirements
 
