@@ -17,60 +17,28 @@ mongoose.connect(dbHost, {
 
 // Preparing product documents
 
-function seedProducts() {
-  const productsPromises = [];
+const seedPrices = (start, limit) => {
   const priceOptions = [9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 99.99];
+  const bulk = Price.collection.initializeOrderedBulkOp();
 
-  for (let k = 0; k < 100; k++) {
-    let products = [];
-    for (let i = 1; i < 1001; i++) {
-      const productMeta = {};
-      productMeta.productId = i + (1000 * k);
-      productMeta.seller = [];
-      const sellerCount = Math.floor(Math.random() * (11 - 1) + 1);
-      for (let j = 1; j <= sellerCount; j++) {
-        const priceIndex = Math.floor(Math.random() * (priceOptions.length - 0) + 0);
-        const sellerMeta = {
-          id: j,
-          price: priceOptions[priceIndex],
-          tax: ((priceOptions[priceIndex] * 0.05).toFixed(2)),
-        };
-        productMeta.seller.push(sellerMeta);
-      }
-      products.push(productMeta);
+  for (let i = start; i < limit; i++) {
+    let productMeta = {};
+    productMeta.productId = i + 1;
+    productMeta.seller = [];
+    const sellerCount = Math.floor(Math.random() * (11 - 1) + 1);
+    for (let j = 1; j <= sellerCount; j++) {
+      const priceIndex = Math.floor(Math.random() * (priceOptions.length - 0) + 0);
+      const sellerMeta = {
+        id: j,
+        price: priceOptions[priceIndex],
+        tax: ((priceOptions[priceIndex] * 0.05).toFixed(2)),
+      };
+      productMeta.seller.push(sellerMeta);
     }
-    productsPromises.push(Price.insertMany(products));
+    bulk.insert(productMeta);
   }
 
-  return Promise.all(productsPromises);
-}
-
-function seedProductsAgain() {
-  const productsPromises = [];
-  const priceOptions = [9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 99.99];
-
-  for (let k = 100; k < 200; k++) {
-    let products = [];
-    for (let i = 1; i < 1001; i++) {
-      const productMeta = {};
-      productMeta.productId = i + (1000 * k);
-      productMeta.seller = [];
-      const sellerCount = Math.floor(Math.random() * (11 - 1) + 1);
-      for (let j = 1; j <= sellerCount; j++) {
-        const priceIndex = Math.floor(Math.random() * (priceOptions.length - 0) + 0);
-        const sellerMeta = {
-          id: j,
-          price: priceOptions[priceIndex],
-          tax: ((priceOptions[priceIndex] * 0.05).toFixed(2)),
-        };
-        productMeta.seller.push(sellerMeta);
-      }
-      products.push(productMeta);
-    }
-    productsPromises.push(Price.insertMany(products));
-  }
-
-  return Promise.all(productsPromises);
+  return bulk.execute();
 }
 
 // Preparing seller documents
@@ -136,8 +104,16 @@ const db = mongoose.connection;
 db.once('open', () => {
   console.log('Deleting DB Now!');
   db.db.dropDatabase()
-    .then(() => seedProducts())
-    .then(() => seedProductsAgain())
+    .then(() => seedPrices(0, 1000000))
+    .then(() => seedPrices(1000000, 2000000))
+    .then(() => seedPrices(2000000, 3000000))
+    .then(() => seedPrices(3000000, 4000000))
+    .then(() => seedPrices(4000000, 5000000))
+    .then(() => seedPrices(5000000, 6000000))
+    .then(() => seedPrices(6000000, 7000000))
+    .then(() => seedPrices(7000000, 8000000))
+    .then(() => seedPrices(8000000, 9000000))
+    .then(() => seedPrices(9000000, 10000000))
     .then(() => Promise.all(sellers))
     .then(() => mongoose.disconnect())
     .catch((err) => {
