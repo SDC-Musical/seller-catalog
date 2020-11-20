@@ -39,11 +39,11 @@ const seedPrices = (start, limit) => {
   query += values.slice(0, values.length - 1);
 
   return new Promise((resolve, reject) => {
-    connection.query(query, (err, results) => {
+    connection.query(query, (err) => {
       if (err) {
         reject('Error seeding prices', err);
       } else {
-        resolve('Successfully loaded prices', results);
+        resolve();
       }
     });
   });
@@ -87,11 +87,11 @@ const seedSellers = () => {
   query += values.slice(0, values.length - 1);
 
   return new Promise((resolve, reject) => {
-    connection.query(query, (err, results) => {
+    connection.query(query, (err) => {
       if (err) {
         reject('Error seeding sellers', err);
       } else {
-        resolve('Successfully loaded sellers', results);
+        resolve();
       }
     });
   });
