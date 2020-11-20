@@ -6,8 +6,8 @@ CREATE TABLE prices (
   id INT AUTO_INCREMENT PRIMARY KEY,
   product_id INT NOT NULL,
   seller INT NOT NULL REFERENCES sellers(id),
-  price INT NOT NULL,
-  tax INT NOT NULL
+  price DECIMAL(4,2) NOT NULL,
+  tax DECIMAL(4,2) NOT NULL
 );
 
 CREATE TABLE sellers (

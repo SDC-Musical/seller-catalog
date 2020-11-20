@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const faker = require('faker');
+const Promise = require('bluebird');
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -10,25 +11,50 @@ const connection = mysql.createConnection({
 
 connection.connect();
 
-// const seedPrices = () => {
-//   const priceOptions = [9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 99.99];
-//   const query =  `INSERT INTO prices (product_id, seller, price, tax) VALUES ?`;
-//   let values = '';
+const seedPrices = (start, limit) => {
+  const priceOptions = [9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 99.99];
+  let query =  `INSERT INTO prices (product_id, seller, price, tax) VALUES`;
+  let values = '';
 
-//   for (let i = 0; i < 100; i++) {
-//     let value = [];
+  for (let i = start; i < limit; i++) {
+    const sellerCount = Math.floor(Math.random() * 4 + 1);
 
-//   }
+    for (let j = 0; j < sellerCount; j++) {
+      const priceIndex = Math.floor(Math.random() * priceOptions.length);
+      let value = [];
 
-//   connection.query('INSERT INTO prices (id, product_id, seller, price, tax) VALUES (?, ?, ?, ?, ?)');
-// }
+      //product_id
+      value.push(i + 1);
+      //seller
+      value.push(Math.floor(Math.random() * 50 + 1));
+      //price
+      value.push(priceOptions[priceIndex]);
+      //tax
+      value.push((priceOptions[priceIndex] * 0.05).toFixed(2));
+
+      values += `(${value.join( )}),`;
+    }
+  }
+
+  query += values.slice(0, values.length - 1);
+
+  return new Promise((resolve, reject) => {
+    connection.query(query, (err, results) => {
+      if (err) {
+        reject('Error seeding prices', err);
+      } else {
+        resolve('Successfully loaded prices', results);
+      }
+    });
+  });
+}
 
 const seedSellers = () => {
-  let query = 'INSERT INTO sellers (seller_name,return_policy, delivery_free,delivery_min,delivery_days,delivery_fee) VALUES';
   const returnOptions = [30, 60, 90];
   const minPurchaseOptions = [20, 35];
   const deliveryDaysOptions = [1, 2, 3, 7];
   const deliveryFeeOptions = [2, 3, 5, 9.99];
+  let query = 'INSERT INTO sellers (seller_name,return_policy, delivery_free,delivery_min,delivery_days,delivery_fee) VALUES';
   let values = '';
 
   for (let i = 0; i < 50; i++) {
@@ -60,13 +86,27 @@ const seedSellers = () => {
   }
   query += values.slice(0, values.length - 1);
 
-  connection.query(query, function (err, results, fields) {
-    if (err) {
-      console.log('Error seeding sellers', err);
-    } else {
-      console.log('Successfully loaded sellers', results);
-    }
+  return new Promise((resolve, reject) => {
+    connection.query(query, (err, results) => {
+      if (err) {
+        reject('Error seeding sellers', err);
+      } else {
+        resolve('Successfully loaded sellers', results);
+      }
+    });
   });
 }
-seedSellers();
-connection.end();
+
+Promise.resolve(seedSellers())
+  .then(() => seedPrices(0, 1000000))
+  .then(() => seedPrices(1000000, 2000000))
+  .then(() => seedPrices(2000000, 3000000))
+  .then(() => seedPrices(3000000, 4000000))
+  .then(() => seedPrices(4000000, 5000000))
+  .then(() => seedPrices(5000000, 6000000))
+  .then(() => seedPrices(6000000, 7000000))
+  .then(() => seedPrices(7000000, 8000000))
+  .then(() => seedPrices(8000000, 9000000))
+  .then(() => seedPrices(9000000, 10000000))
+  .then(() => connection.end())
+  .catch((err) => console.log(err));
