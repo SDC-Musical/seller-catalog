@@ -3,6 +3,8 @@
 const pricesModel = require('../database/models/prices');
 const sellersModel = require('../database/models/sellers');
 const { createQuotes } = require('../services/quotes');
+const db = require('../mysql-db/index.js');
+const { sellerOffer } = require('../services/helper.js');
 
 const prices = (req, res) => {
   if (req.query.productId !== undefined) {
@@ -50,6 +52,25 @@ const quotes = (req, res) => {
     })
     .catch(() => res.status(500).send('Internal Server Error.'));
 };
+
+const getQuotes = (req, res) => {
+  if (req.query.productId && isNaN(Number(req.query.productId))) {
+    return res.status(400).send('Bad Request.');
+  }
+
+  db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.query.productId} AND prices.seller = sellers.id`, (err, result) => {
+    if (err) {
+      res.status(500).send(err);
+    } else if (result.length === 0) {
+      res.status(404).send('Product Not Found');
+    } else {
+      result.map((quote) => {
+        quote.offer = sellerOffer(quote);
+      });
+      res.send(result);
+    }
+  })
+}
 
 const addPrices = (req, res) => {
   pricesModel.fetchPrices(req.body.productId)
@@ -108,7 +129,7 @@ const updateSeller = (req, res) => {
 module.exports = {
   prices,
   sellers,
-  quotes,
+  getQuotes,
   addPrices,
   addSeller,
   deletePrices,

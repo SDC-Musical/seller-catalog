@@ -9,22 +9,23 @@ const sellerName = (id, sellers) => {
   return '';
 };
 
-const sellerOffer = (id, sellers) => {
-  const dayOfTheWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  for (let i = 0; i < sellers.length; i++) {
-    if (sellers[i].id === id) {
-      const { delivery } = sellers[i];
-      const deliveryDay = new Date();
-      deliveryDay.setDate(deliveryDay.getDate() + delivery.days);
-      if (delivery.free === 'True') {
-        return `Free delivery by ${dayOfTheWeek[deliveryDay.getDay()]}, ${month[deliveryDay.getMonth()]} ${deliveryDay.getDate()}`;
-      }
-      return `Spend $${delivery.minimumPurchase} for free delivery by ${dayOfTheWeek[deliveryDay.getDay()]}, ${month[deliveryDay.getMonth()]} ${deliveryDay.getDate()}`;
-    }
+const sellerOffer = (quote) => {
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const deliveryDay = new Date();
+
+  deliveryDay.setDate(deliveryDay.getDate() + quote.delivery_days);
+
+  const day = days[deliveryDay.getDay()];
+  const month = months[deliveryDay.getMonth()];
+  const date = deliveryDay.getDate();
+
+  if (quote.delivery_free === 0) {
+    return `Free delivery by ${day}, ${month} ${date}`;
+  } else {
+    return `Spend $${quote.delivery_min} for free delivery by ${day}, ${month} ${date}`;
   }
-  return '';
-};
+}
 
 const sellerReturnPolicy = (id, sellers) => {
   for (let i = 0; i < sellers.length; i++) {

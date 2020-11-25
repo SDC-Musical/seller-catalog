@@ -42,7 +42,7 @@ class Options extends React.Component {
       return <h3>{this.state.error}</h3>;
     }
     if (this.state.quotes.length) {
-      const sellerOptions = this.state.quotes[0].seller.map((option) => (
+      const sellerOptions = this.state.quotes.map((option) => (
         <Sellers seller={option} key={option.id} />
       ));
       return (
