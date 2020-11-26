@@ -73,33 +73,44 @@ const getQuotes = (req, res) => {
 }
 
 const addPrices = (req, res) => {
-  pricesModel.fetchPrices(req.body.productId)
-    .then((pricesRecord) => {
-      if (pricesRecord.length === 0) {
-        pricesModel.addPrices(req.body);
-      } else {
-        throw 'Product already exists';
-      }
-    })
-    .then(() => {
-      res.sendStatus(200);
-    })
-    .catch((err) => {
-      res.status(404).send(err);
-    });
+  const values = [];
+
+  db.query()
+  db.query(`INSERT INTO prices VALUES(?, ?, ?, ?)`, )
+
+  // pricesModel.fetchPrices(req.body.productId)
+  //   .then((pricesRecord) => {
+  //     if (pricesRecord.length === 0) {
+  //       pricesModel.addPrices(req.body);
+  //     } else {
+  //       throw 'Product already exists';
+  //     }
+  //   })
+  //   .then(() => {
+  //     res.sendStatus(200);
+  //   })
+  //   .catch((err) => {
+  //     res.status(404).send(err);
+  //   });
 };
 
 const addSeller = (req, res) => {
-  sellersModel.fetchSeller(req.body.id)
-    .then((sellerRecord) => {
-      if (sellerRecord.length === 0) {
-        sellersModel.addSeller(req.body);
-      } else {
-        throw 'Seller already exists';
-      }
-    })
-    .then(() => res.sendStatus(200))
-    .catch((err) => res.status(404).send(err));
+  const values = [];
+
+  values.push(req.body.seller);
+  values.push(req.body.returnPolicy);
+  values.push(req.body.deliveryFree);
+  values.push(req.body.deliveryMin);
+  values.push(req.body.deliveryDays);
+  values.push(req.body.deliveryFee);
+
+  db.query(`INSERT INTO sellers (seller_name,return_policy, delivery_free,delivery_min,delivery_days,delivery_fee) VALUES(?, ?, ?, ?, ?, ?)`, values, (err) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.sendStatus(200);
+    }
+  });
 }
 
 const deletePrices = (req, res) => {
