@@ -75,23 +75,18 @@ const getQuotes = (req, res) => {
 const addPrices = (req, res) => {
   const values = [];
 
-  db.query()
-  db.query(`INSERT INTO prices VALUES(?, ?, ?, ?)`, )
+  values.push(req.body.productId);
+  values.push(req.body.seller);
+  values.push(req.body.price);
+  values.push(req.body.tax);
 
-  // pricesModel.fetchPrices(req.body.productId)
-  //   .then((pricesRecord) => {
-  //     if (pricesRecord.length === 0) {
-  //       pricesModel.addPrices(req.body);
-  //     } else {
-  //       throw 'Product already exists';
-  //     }
-  //   })
-  //   .then(() => {
-  //     res.sendStatus(200);
-  //   })
-  //   .catch((err) => {
-  //     res.status(404).send(err);
-  //   });
+  db.query(`INSERT INTO prices (product_id, seller, price, tax) VALUES(?, (SELECT id FROM sellers WHERE seller_name = ?), ?, ?)`, values, (err) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.sendStatus(200);
+    }
+  });
 };
 
 const addSeller = (req, res) => {
