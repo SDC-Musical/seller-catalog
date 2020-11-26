@@ -109,15 +109,30 @@ const addSeller = (req, res) => {
 }
 
 const deletePrices = (req, res) => {
-  pricesModel.deletePrices(req.body.productId)
-    .then(() => res.sendStatus(200))
-    .catch((err) => res.status(404).send(err));
+  const values = [];
+
+  values.push(req.body.productId);
+  values.push(req.body.seller);
+
+  db.query(`DELETE FROM prices WHERE product_id = ? AND seller = (SELECT id FROM sellers WHERE seller_name = ?)`, values, (err) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.sendStatus(200);
+    }
+  });
 };
 
 const deleteSeller = (req, res) => {
-  sellersModel.deleteSeller(req.body.id)
-    .then(() => res.sendStatus(200))
-    .catch((err) => res.status(400).send(err));
+  const value = req.body.seller;
+
+  db.query(`DELETE FROM sellers WHERE seller_name = ?`, value, (err) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.sendStatus(200);
+    }
+  });
 }
 
 const updatePrices = (req, res) => {
