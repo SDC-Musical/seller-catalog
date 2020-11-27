@@ -142,9 +142,18 @@ const updatePrices = (req, res) => {
 }
 
 const updateSeller = (req, res) => {
-  sellersModel.updateSeller(req.body.id, req.body.sellerUpdate)
-    .then(() => res.sendStatus(200))
-    .catch((err) => res.status(404).send(err));
+  const values = [];
+
+  values.push(req.body.updateValue);
+  values.push(req.body.seller);
+
+  db.query(`UPDATE sellers SET ${req.body.updateParam} = ? WHERE seller_name = ?`, values, (err) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.sendStatus(200);
+    }
+  });
 }
 
 module.exports = {
