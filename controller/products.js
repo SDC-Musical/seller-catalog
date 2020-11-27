@@ -117,8 +117,6 @@ const updateSeller = (req, res) => {
 }
 
 module.exports = {
-  prices,
-  sellers,
   getQuotes,
   addPrices,
   addSeller,
