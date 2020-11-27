@@ -1,57 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-restricted-globals */
-const pricesModel = require('../database/models/prices');
-const sellersModel = require('../database/models/sellers');
-const { createQuotes } = require('../services/quotes');
 const db = require('../mysql-db/index.js');
 const { sellerOffer } = require('../services/helper.js');
-
-const prices = (req, res) => {
-  if (req.query.productId !== undefined) {
-    pricesModel.retrievePrices(req.query.productId)
-      .then((productData) => res.send(productData));
-  } else {
-    pricesModel.retrievePrices()
-      .then((productData) => res.send(productData));
-  }
-};
-
-const sellers = (req, res) => {
-  sellersModel.retrieveSellers()
-    .then((sellerData) => res.send(sellerData));
-};
-
-const quotes = (req, res) => {
-  let id = null;
-  if (req.query.productId) {
-    id = req.query.productId;
-  }
-
-  if (id && isNaN(Number(id))) {
-    return res.status(400).send('Bad Request.');
-  }
-
-  let priceInfo;
-  let sellerInfo;
-
-  sellersModel.retrieveSellers()
-    .then((sellerData) => {
-      sellerInfo = sellerData;
-      return pricesModel.retrievePrices(id);
-    })
-    .then((productData) => {
-      priceInfo = productData;
-      return true;
-    })
-    .then(() => createQuotes(priceInfo, sellerInfo, req.query.sellerLimit))
-    .then((quoteData) => {
-      if (!quoteData.length) {
-        return res.status(404).send('Product Not Found.');
-      }
-      return res.send(quoteData);
-    })
-    .catch(() => res.status(500).send('Internal Server Error.'));
-};
 
 const getQuotes = (req, res) => {
   if (req.query.productId && isNaN(Number(req.query.productId))) {
@@ -136,9 +86,19 @@ const deleteSeller = (req, res) => {
 }
 
 const updatePrices = (req, res) => {
-  pricesModel.updatePrices(req.body.productId, req.body.sellerId, req.body.priceUpdate)
-    .then(() => res.sendStatus(200))
-    .catch((err) => res.status(404).send(err));
+  const values = [];
+
+  values.push(req.body.updateValue);
+  values.push(req.body.productId);
+  values.push(req.body.seller);
+
+  db.query(`UPDATE prices SET ${req.body.updateParam} = ? WHERE product_id = ? AND seller = (SELECT id FROM sellers WHERE seller_name = ?)`, values, (err) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.sendStatus(200);
+    }
+  });
 }
 
 const updateSeller = (req, res) => {
