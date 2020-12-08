@@ -9,12 +9,12 @@ const Sellers = ({ seller }) => {
   return (
     <div className={styles.sellerOption}>
       <div>
-        <div className={styles.total}>{`$${seller.totalPrice}`}</div>
+        <div className={styles.total}>{`$${seller.price + seller.tax}`}</div>
         <div>{`$${seller.tax} est. tax`}</div>
         <div>{seller.offer}</div>
-        <div>{seller.returnPolicy}</div>
+        <div>{seller.return_policy}</div>
         <div className={styles.store}>
-          {seller.name}
+          {seller.seller_name}
         </div>
         <div className={styles.gGuarantee}>
           <span>
