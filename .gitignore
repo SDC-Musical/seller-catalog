@@ -4,3 +4,4 @@ client/dist/bundle-seller-catalog.js
 .env
 nohup.out
 coverage
+couchdb/seed-data

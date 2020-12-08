@@ -1,0 +1,16 @@
+config:
+  target: "http://localhost:3002"
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      name: "Baseline test with 1 user per second"
+  payload:
+    - path: "productId.csv"
+      fields:
+        - "productId"
+      order: sequence
+scenarios:
+  - name: "GET route"
+    flow:
+      - get:
+          url: "/api/product/quotes?productId={{productId}}"

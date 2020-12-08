@@ -17,7 +17,8 @@ const getQuotes = (req, res) => {
       result.map((quote) => {
         quote.offer = sellerOffer(quote);
       });
-      res.send(result);
+      result.sort((a, b) => { return a.price - b.price });
+      res.send(result.slice(0, 4));
     }
   })
 }
