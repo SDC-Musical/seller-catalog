@@ -1,11 +1,36 @@
 config:
   target: "http://localhost:3002"
   phases:
+    - duration: 30
+      arrivalRate: 10
+      rampTo: 100
+      name: "Ramp up to 100"
     - duration: 60
-      arrivalRate: 1
-      name: "Baseline test with 1 user per second"
+      arrivalRate: 100
+      name: "Constant 100"
   variables:
-    productId:
+    get_productId:
+      - "10000000"
+      - "9340283"
+      - "9000000"
+      - "8239485"
+      - "8000000"
+      - "7849245"
+      - "7000000"
+      - "6483919"
+      - "6000000"
+      - "5329432"
+      - "5000000"
+      - "4329491"
+      - "4000000"
+      - "3653284"
+      - "3000000"
+      - "2453859"
+      - "2000000"
+      - "1452859"
+      - "1000000"
+      - "48296"
+    post_productId:
       - "10000000"
       - "9000000"
       - "8000000"
@@ -40,12 +65,16 @@ config:
       - "Elwin"
       - "Buddy"
 scenarios:
+  - name: "GET route"
+    flow:
+      - get:
+          url: "/api/product/quotes?productId={{get_productId}}"
   - name: "POST route"
     flow:
       - post:
           url: "/api/product/prices"
           json:
-            productId: "{{productId}}"
+            productId: "{{post_productId}}"
             seller: "{{seller}}"
             price: "{{price}}"
             tax: "{{tax}}"

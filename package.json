@@ -21,8 +21,7 @@
     "seed": "node --max-old-space-size=8192 database/seed.js",
     "test:server": "nyc mocha specs/server.js",
     "test:client": "jest --coverage",
-    "artillery-get": "artillery run performance_test/GET-test.yml",
-    "artillery-post": "artillery run performance_test/POST-test.yml"
+    "artillery": "artillery run performance_test/load-test.yml"
   },
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.12.1",

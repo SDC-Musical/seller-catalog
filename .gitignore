@@ -5,3 +5,4 @@ client/dist/bundle-seller-catalog.js
 nohup.out
 coverage
 couchdb/seed-data
+newrelic.js
