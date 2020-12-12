@@ -5,3 +5,7 @@ client/dist/bundle-seller-catalog.js
 nohup.out
 coverage
 couchdb/seed-data
+<<<<<<< HEAD
+=======
+newrelic.js
+>>>>>>> performance-test

@@ -20,7 +20,8 @@
     "lint": "eslint . --ext .js",
     "seed": "node --max-old-space-size=8192 database/seed.js",
     "test:server": "nyc mocha specs/server.js",
-    "test:client": "jest --coverage"
+    "test:client": "jest --coverage",
+    "artillery": "artillery run performance_test/load-test.yml"
   },
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.12.1",
@@ -66,6 +67,7 @@
     "faker": "^5.1.0",
     "identity-obj-proxy": "^3.0.0",
     "mocha": "^8.2.0",
+    "newrelic": "^7.0.2",
     "nodemon": "^2.0.4",
     "nyc": "^15.1.0",
     "style-loader": "^2.0.0",

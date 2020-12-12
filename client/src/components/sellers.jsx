@@ -9,7 +9,7 @@ const Sellers = ({ seller }) => {
   return (
     <div className={styles.sellerOption}>
       <div>
-        <div className={styles.total}>{`$${seller.price + seller.tax}`}</div>
+        <div className={styles.total}>{`$${(seller.price + seller.tax).toFixed(2)}`}</div>
         <div>{`$${seller.tax} est. tax`}</div>
         <div>{seller.offer}</div>
         <div>{seller.return_policy}</div>
