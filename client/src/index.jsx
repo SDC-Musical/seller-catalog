@@ -5,6 +5,6 @@ import App from './components/app';
 
 ReactDOM.render(
   <Router>
-    <Route path="/sellers/:id" component={App} />
+    <Route path="/:id" component={App} />
   </Router>, document.getElementById('price-card'),
 );
