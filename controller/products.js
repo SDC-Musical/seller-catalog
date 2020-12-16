@@ -1,6 +1,14 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-restricted-globals */
 const db = require('../mysql-db/index.js');
+const redis = require('redis');
+
+const client = redis.createClient(6379);
+
+client.on('error', (err) => {
+  console.log('Error' + err);
+});
+
 const { sellerOffer } = require('../services/helper.js');
 
 const getQuotes = (req, res) => {
@@ -8,19 +16,31 @@ const getQuotes = (req, res) => {
     return res.status(400).send('Bad Request.');
   }
 
-  db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.query.productId} AND prices.seller = sellers.id`, (err, result) => {
+  client.get(req.query.productId, (err, quotes) => {
     if (err) {
       res.status(500).send(err);
-    } else if (result.length === 0) {
-      res.status(404).send('Product Not Found');
+    } else if (quotes) {
+      res.send(JSON.parse(quotes));
     } else {
-      result.map((quote) => {
-        quote.offer = sellerOffer(quote);
+      db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.query.productId} AND prices.seller = sellers.id`, (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+        } else if (result.length === 0) {
+          res.status(404).send('Product Not Found');
+        } else {
+          result.map((quote) => {
+            quote.offer = sellerOffer(quote);
+          });
+          result.sort((a, b) => { return a.price - b.price });
+
+          client.set(req.query.productId, JSON.stringify(result.slice(0, 4)));
+
+          res.send(result.slice(0, 4));
+        }
       });
-      result.sort((a, b) => { return a.price - b.price });
-      res.send(result.slice(0, 4));
     }
-  })
+  });
+
 }
 
 const addPrices = (req, res) => {

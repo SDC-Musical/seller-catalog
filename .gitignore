@@ -6,3 +6,4 @@ nohup.out
 coverage
 couchdb/seed-data
 newrelic.js
+newrelic_agent.log
