@@ -146,22 +146,42 @@ const updatePrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      res.sendStatus(200);
+      db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          let options = formatOptions(result);
+
+          client.set(req.body.productId, JSON.stringify(options));
+
+          res.sendStatus(200);
+        }
+      });
     }
   });
 }
 
 const updateSeller = (req, res) => {
   const values = [];
+  let productIds;
 
   values.push(req.body.updateValue);
   values.push(req.body.seller);
 
-  db.query(`UPDATE sellers SET ${req.body.updateParam} = ? WHERE seller_name = ?`, values, (err) => {
+  db.query(`SELECT product_id FROM prices WHERE seller = (SELECT id FROM sellers WHERE seller_name = ?)`, req.body.seller, (err, result) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      res.sendStatus(200);
+      productIds = result.map((id) => { return id.product_id });
+      client.del(productIds);
+
+      db.query(`UPDATE sellers SET ${req.body.updateParam} = ? WHERE seller_name = ?`, values, (err) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          res.sendStatus(200);
+        }
+      });
     }
   });
 }
