@@ -9,7 +9,7 @@ client.on('error', (err) => {
   console.log('Error' + err);
 });
 
-const { sellerOffer } = require('../services/helper.js');
+const { sellerOffer, formatOptions } = require('../services/helper.js');
 
 const getQuotes = (req, res) => {
   if (req.query.productId && isNaN(Number(req.query.productId))) {
@@ -28,14 +28,11 @@ const getQuotes = (req, res) => {
         } else if (result.length === 0) {
           res.status(404).send('Product Not Found');
         } else {
-          result.map((quote) => {
-            quote.offer = sellerOffer(quote);
-          });
-          result.sort((a, b) => { return a.price - b.price });
+          let options = formatOptions(result);
 
-          client.set(req.query.productId, JSON.stringify(result.slice(0, 4)));
+          client.set(req.query.productId, JSON.stringify(options));
 
-          res.send(result.slice(0, 4));
+          res.send(options);
         }
       });
     }
@@ -56,6 +53,20 @@ const addPrices = (req, res) => {
       res.status(500).send(err);
     } else {
       res.sendStatus(200);
+      // db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
+      //   if (err) {
+      //     res.status(500).send(err);
+      //   } else {
+      //     result.map((quote) => {
+      //       quote.offer = sellerOffer(quote);
+      //     });
+      //     result.sort((a, b) => { return a.price - b.price });
+
+      //     client.set(req.query.productId, JSON.stringify(result.slice(0, 4)));
+
+      //     res.sendStatus(200);
+      //   }
+      // });
     }
   });
 };
