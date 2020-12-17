@@ -58,7 +58,7 @@ const addPrices = (req, res) => {
         } else {
           let options = formatOptions(result);
 
-          client.set(req.query.productId, JSON.stringify(options));
+          client.set(req.body.productId, JSON.stringify(options));
 
           res.sendStatus(200);
         }
@@ -96,21 +96,43 @@ const deletePrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      res.sendStatus(200);
+      db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          let options = formatOptions(result);
+
+          client.set(req.body.productId, JSON.stringify(options));
+
+          res.sendStatus(200);
+        }
+      });
     }
   });
 };
 
 const deleteSeller = (req, res) => {
   const value = req.body.seller;
+  let productIds;
 
-  db.query(`DELETE FROM sellers WHERE seller_name = ?`, value, (err) => {
+  db.query(`SELECT product_id FROM prices WHERE seller = (SELECT id FROM sellers WHERE seller_name = ?)`, value, (err, result) => {
     if (err) {
-      res.status(500).send(err);
+      res.status(500).send(err)
     } else {
-      res.sendStatus(200);
+      productIds = result.map((id) => { return id.product_id });
+
+      client.del(productIds);
+
+      db.query(`DELETE FROM prices, sellers USING prices INNER JOIN sellers WHERE sellers.seller_name = ? AND prices.seller = sellers.id`, value, (err) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          res.sendStatus(200);
+        }
+      });
     }
-  });
+  })
+
 }
 
 const updatePrices = (req, res) => {
