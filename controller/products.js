@@ -52,21 +52,17 @@ const addPrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      res.sendStatus(200);
-      // db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
-      //   if (err) {
-      //     res.status(500).send(err);
-      //   } else {
-      //     result.map((quote) => {
-      //       quote.offer = sellerOffer(quote);
-      //     });
-      //     result.sort((a, b) => { return a.price - b.price });
+      db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          let options = formatOptions(result);
 
-      //     client.set(req.query.productId, JSON.stringify(result.slice(0, 4)));
+          client.set(req.query.productId, JSON.stringify(options));
 
-      //     res.sendStatus(200);
-      //   }
-      // });
+          res.sendStatus(200);
+        }
+      });
     }
   });
 };
