@@ -23,7 +23,7 @@ const formatOptions = (options) => {
     quote.offer = sellerOffer(quote);
   });
 
-  options.sort((a, b) => { return a.price - b.price });
+  options.sort((a, b) => { return (a.price + a.tax) - (b.price + b.tax) });
 
   return options.slice(0, 4);
 }

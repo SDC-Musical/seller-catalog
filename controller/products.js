@@ -9,7 +9,7 @@ client.on('error', (err) => {
   console.log('Error' + err);
 });
 
-const { sellerOffer, formatOptions } = require('../services/helper.js');
+const { formatOptions } = require('../services/helper.js');
 
 const getQuotes = (req, res) => {
   if (req.query.productId && isNaN(Number(req.query.productId))) {
@@ -52,17 +52,19 @@ const addPrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
-        if (err) {
-          res.status(500).send(err);
-        } else {
-          let options = formatOptions(result);
+      // db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
+      //   if (err) {
+      //     res.status(500).send(err);
+      //   } else {
+      //     let options = formatOptions(result);
 
-          client.set(req.body.productId, JSON.stringify(options));
+      //     client.set(req.body.productId, JSON.stringify(options));
 
-          res.sendStatus(200);
-        }
-      });
+      //     res.sendStatus(200);
+      //   }
+      // });
+      client.del(req.body.productId);
+      res.sendStatus(200);
     }
   });
 };
