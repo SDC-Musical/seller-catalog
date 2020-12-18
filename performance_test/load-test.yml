@@ -6,10 +6,10 @@ config:
       name: "Warm up"
     - duration: 60
       arrivalRate: 10
-      rampTo: 100
+      rampTo: 300
       name: "Ramp to 300"
-    - duration: 240
-      arrivalRate: 100
+    - duration: 300
+      arrivalRate: 300
       name: "Constant 300"
   variables:
     get_productId:

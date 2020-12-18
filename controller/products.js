@@ -52,17 +52,6 @@ const addPrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      // db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
-      //   if (err) {
-      //     res.status(500).send(err);
-      //   } else {
-      //     let options = formatOptions(result);
-
-      //     client.set(req.body.productId, JSON.stringify(options));
-
-      //     res.sendStatus(200);
-      //   }
-      // });
       client.del(req.body.productId);
       res.sendStatus(200);
     }
@@ -98,17 +87,8 @@ const deletePrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
-        if (err) {
-          res.status(500).send(err);
-        } else {
-          let options = formatOptions(result);
-
-          client.set(req.body.productId, JSON.stringify(options));
-
-          res.sendStatus(200);
-        }
-      });
+      client.del(req.body.productId);
+      res.sendStatus(200);
     }
   });
 };
@@ -148,17 +128,8 @@ const updatePrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.body.productId} AND prices.seller = sellers.id`, (err, result) => {
-        if (err) {
-          res.status(500).send(err);
-        } else {
-          let options = formatOptions(result);
-
-          client.set(req.body.productId, JSON.stringify(options));
-
-          res.sendStatus(200);
-        }
-      });
+      client.del(req.body.productId);
+      res.sendStatus(200);
     }
   });
 }
