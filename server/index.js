@@ -16,13 +16,10 @@ const isProd = process.env.NODE_ENV === 'production';
 const hostname = process.env.HOST || 'localhost';
 const PORT = process.env.PORT || 3002;
 
-app.use('/', express.static(path.join(__dirname, '/../client/dist')));
+app.use(express.static(path.join(__dirname, '/../client/dist')));
+app.use('/:id', express.static(path.join(__dirname, '/../client/dist')));
 
 app.use('/api', router);
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/../client/dist/index.html'));
-});
 
 app.listen(PORT, () => {
   console.log(`App listening at http://${hostname}:${PORT}`);
