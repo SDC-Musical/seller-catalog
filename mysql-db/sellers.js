@@ -1,7 +1,7 @@
 const faker = require('faker');
 const fs = require('fs');
 
-const sellers= fs.createWriteStream('mysql-db/csv/sellers.csv');
+const sellers = fs.createWriteStream('mysql-db/csv/sellers.csv');
 
 sellers.write('id,seller_name,return_policy,delivery_free, delivery_min,delivery_days,delivery_fee\n', 'utf8');
 
@@ -11,7 +11,7 @@ const random = (arr) => {
 
 const writeSellers = (writer, encoding, cb) => {
   const options = {
-    free: [true, false],
+    free: [0, 1],
     minPurchase: [20, 35],
     deliveryDays: [1, 2, 3, 7],
     deliveryFee: [2, 3, 5, 9.99],
@@ -30,9 +30,9 @@ const writeSellers = (writer, encoding, cb) => {
       let name = faker.name.firstName();
       let returnPolicy = `Return eligible for ${random(options.returnPolicy)} days`;
       let free = random(options.free);
-      let minPurchase = free ? 0 : random(options.minPurchase);
+      let minPurchase = free === 0 ? 0 : random(options.minPurchase);
       let days = random(options.deliveryDays);
-      let fee = free ? 0 : random(options.deliveryFee);
+      let fee = free === 0 ? 0 : random(options.deliveryFee);
 
       let data = `${id},${name},${returnPolicy},${free},${minPurchase},${days},${fee}\n`;
 
