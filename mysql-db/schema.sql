@@ -7,7 +7,8 @@ CREATE TABLE prices (
   product_id INT NOT NULL,
   seller INT NOT NULL REFERENCES sellers(id),
   price DECIMAL(4,2) NOT NULL,
-  tax DECIMAL(4,2) NOT NULL
+  tax DECIMAL(4,2) NOT NULL,
+  INDEX (product_id)
 );
 
 CREATE TABLE sellers (
