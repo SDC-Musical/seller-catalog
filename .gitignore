@@ -7,7 +7,5 @@ coverage
 couchdb/seed-data
 newrelic.js
 newrelic_agent.log
-<<<<<<< HEAD
 mysql-db/csv
-=======
->>>>>>> d19ad7611cee788c8d6fef16ec8bc2d69e3b83fa
+mysql-db/config

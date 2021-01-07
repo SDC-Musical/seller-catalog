@@ -1,25 +1,16 @@
 const mysql = require('mysql');
 const faker = require('faker');
 const Promise = require('bluebird');
+const db = require('./config/mysql');
 
-// const connection = mysql.createConnection({
-//   host: 'localhost',
-//   user: 'root',
-//   password: '',
-//   database: 'temp'
-// });
-
-const pool = mysql.createPool({
+const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'temp',
-  waitForConnections: true,
-  connectionLimit: 10,
-  acquireTimeout: 60000
+  user: db.MYSQL_USER,
+  password: db.MYSQL_PW,
+  database: db.MYSQL_DB
 });
 
-// connection.connect();
+connection.connect();
 
 const seedPrices = (start, limit) => {
   const priceOptions = [9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 99.99];
@@ -48,44 +39,15 @@ const seedPrices = (start, limit) => {
 
   query += values.slice(0, values.length - 1);
 
-  // return new Promise((resolve, reject) => {
-  //   pool.query(query, (err) => {
-  //     if (err) {
-  //       reject(`Error seeding prices from ${start}-${limit}: ${err}`);
-  //     } else {
-  //       console.log(`Successfully seeded prices ${start}-${limit}`);
-  //       resolve();
-  //     }
-  //   });
-  // });
-
   return new Promise((resolve, reject) => {
-    pool.getConnection((err, connection) => {
+    connection.query(query, (err) => {
       if (err) {
-        reject(`Connection error seeding prices from ${start}-${limit}: ${err}`);
+        reject(`Error seeding prices from ${start} - ${limit}: ${err}`);
       } else {
-        connection.query(query, (error) => {
-          console.log(`Successfully seeded ${start}-${limit}`);
-          connection.release();
-          resolve();
-
-          if (error) {
-            reject(`Error seeding prices from ${start} - ${limit}: ${error}`);
-          }
-        });
+        resolve(`Successfully seeded ${start} - ${limit}`);
       }
     });
   });
-
-  // return new Promise((resolve, reject) => {
-  //   connection.query(query, (err) => {
-  //     if (err) {
-  //       reject(`Error seeding prices from ${start} - ${limit}: ${err}`);
-  //     } else {
-  //       resolve(`Successfully seeded ${start} - ${limit}`);
-  //     }
-  //   });
-  // });
 }
 
 const seedSellers = () => {
@@ -125,47 +87,27 @@ const seedSellers = () => {
   }
   query += values.slice(0, values.length - 1);
 
-  // return new Promise((resolve, reject) => {
-  //   connection.query(query, (err) => {
-  //     if (err) {
-  //       reject(`Error seeding sellers: ${err}`);
-  //     } else {
-  //       resolve('Successfully seeded sellers');
-  //     }
-  //   });
-  // });
-
   return new Promise((resolve, reject) => {
-    pool.getConnection(function(err, connection) {
+    connection.query(query, (err) => {
       if (err) {
-        reject(`Connection error seeding sellers: ${err}`);
+        reject(`Error seeding sellers: ${err}`);
       } else {
-        connection.query(query, function(error, results, fields) {
-          console.log('Successfully seeded sellers');
-          connection.release();
-          resolve();
-
-          if (error) {
-            reject(`Error seeding sellers: ${error}`);
-          }
-        });
+        resolve('Successfully seeded sellers');
       }
     });
   });
 }
 
-// Promise.resolve(seedSellers())
-Promise.resolve(seedPrices(0, 100000))
-//   .then(() => seedPrices(0, 1000000))
-  // .then(() => seedPrices(1000000, 2000000))
-  // .then(() => seedPrices(2000000, 3000000))
-  // .then(() => seedPrices(3000000, 4000000))
-  // .then(() => seedPrices(4000000, 5000000))
-  // .then(() => seedPrices(5000000, 6000000))
-  // .then(() => seedPrices(6000000, 7000000))
-  // .then(() => seedPrices(7000000, 8000000))
-  // .then(() => seedPrices(8000000, 9000000))
-  // .then(() => seedPrices(9000000, 10000000))
-  // .then(() => connection.end())
-  .then(() => pool.end((err) => console.log('Successfully seeded database')))
+Promise.resolve(seedSellers())
+  .then(() => seedPrices(0, 1000000))
+  .then(() => seedPrices(1000000, 2000000))
+  .then(() => seedPrices(2000000, 3000000))
+  .then(() => seedPrices(3000000, 4000000))
+  .then(() => seedPrices(4000000, 5000000))
+  .then(() => seedPrices(5000000, 6000000))
+  .then(() => seedPrices(6000000, 7000000))
+  .then(() => seedPrices(7000000, 8000000))
+  .then(() => seedPrices(8000000, 9000000))
+  .then(() => seedPrices(9000000, 10000000))
+  .then(() => connection.end())
   .catch((err) => console.log(err));
