@@ -7,6 +7,7 @@ import styles from './main.module.css';
 const App = ({ match }) => (
   <div id={styles.container}>
     <Header />
+    {console.log(match.params)}
     <Options productId={match.params.id} />
   </div>
 );

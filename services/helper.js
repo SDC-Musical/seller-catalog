@@ -1,14 +1,5 @@
 /* eslint-disable no-plusplus */
 
-const sellerName = (id, sellers) => {
-  for (let i = 0; i < sellers.length; i++) {
-    if (sellers[i].id === id) {
-      return sellers[i].name;
-    }
-  }
-  return '';
-};
-
 const sellerOffer = (quote) => {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -27,28 +18,17 @@ const sellerOffer = (quote) => {
   }
 }
 
-const sellerReturnPolicy = (id, sellers) => {
-  for (let i = 0; i < sellers.length; i++) {
-    if (sellers[i].id === id) {
-      return sellers[i].returnPolicy;
-    }
-  }
-  return '';
-};
+const formatOptions = (options) => {
+  options.map((quote) => {
+    quote.offer = sellerOffer(quote);
+  });
 
-const sellerShippingFee = (id, sellers) => {
-  for (let i = 0; i < sellers.length; i++) {
-    const { delivery } = sellers[i];
-    if (sellers[i].id === id) {
-      return delivery.fee;
-    }
-  }
-  return '';
-};
+  options.sort((a, b) => { return (a.price + a.tax) - (b.price + b.tax) });
+
+  return options.slice(0, 4);
+}
 
 module.exports = {
-  sellerName,
   sellerOffer,
-  sellerReturnPolicy,
-  sellerShippingFee,
+  formatOptions
 };

@@ -1,12 +1,13 @@
 const mysql = require('mysql');
 const faker = require('faker');
 const Promise = require('bluebird');
+const db = require('./config/mysql');
 
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'buying_options'
+  user: db.MYSQL_USER,
+  password: db.MYSQL_PW,
+  database: db.MYSQL_DB
 });
 
 connection.connect();
@@ -41,9 +42,9 @@ const seedPrices = (start, limit) => {
   return new Promise((resolve, reject) => {
     connection.query(query, (err) => {
       if (err) {
-        reject('Error seeding prices', err);
+        reject(`Error seeding prices from ${start} - ${limit}: ${err}`);
       } else {
-        resolve();
+        resolve(`Successfully seeded ${start} - ${limit}`);
       }
     });
   });
@@ -89,9 +90,9 @@ const seedSellers = () => {
   return new Promise((resolve, reject) => {
     connection.query(query, (err) => {
       if (err) {
-        reject('Error seeding sellers', err);
+        reject(`Error seeding sellers: ${err}`);
       } else {
-        resolve();
+        resolve('Successfully seeded sellers');
       }
     });
   });

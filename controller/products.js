@@ -1,26 +1,43 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-restricted-globals */
 const db = require('../mysql-db/index.js');
-const { sellerOffer } = require('../services/helper.js');
+const redis = require('redis');
+
+const client = redis.createClient(6379);
+
+client.on('error', (err) => {
+  console.log('Error' + err);
+});
+
+const { formatOptions } = require('../services/helper.js');
 
 const getQuotes = (req, res) => {
   if (req.query.productId && isNaN(Number(req.query.productId))) {
     return res.status(400).send('Bad Request.');
   }
 
-  db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.query.productId} AND prices.seller = sellers.id`, (err, result) => {
+  client.get(req.query.productId, (err, quotes) => {
     if (err) {
       res.status(500).send(err);
-    } else if (result.length === 0) {
-      res.status(404).send('Product Not Found');
+    } else if (quotes) {
+      res.send(JSON.parse(quotes));
     } else {
-      result.map((quote) => {
-        quote.offer = sellerOffer(quote);
+      db.query(`SELECT prices.price, prices.tax, prices.id, sellers.seller_name, sellers.return_policy, sellers.delivery_free, sellers.delivery_min, sellers.delivery_days, sellers.delivery_fee FROM prices, sellers WHERE prices.product_id = ${req.query.productId} AND prices.seller = sellers.id`, (err, result) => {
+        if (err) {
+          res.status(500).send(err);
+        } else if (result.length === 0) {
+          res.status(404).send('Product Not Found');
+        } else {
+          let options = formatOptions(result);
+
+          client.set(req.query.productId, JSON.stringify(options));
+
+          res.send(options);
+        }
       });
-      result.sort((a, b) => { return a.price - b.price });
-      res.send(result.slice(0, 4));
     }
-  })
+  });
+
 }
 
 const addPrices = (req, res) => {
@@ -35,6 +52,7 @@ const addPrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
+      client.del(req.body.productId);
       res.sendStatus(200);
     }
   });
@@ -69,6 +87,7 @@ const deletePrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
+      client.del(req.body.productId);
       res.sendStatus(200);
     }
   });
@@ -76,14 +95,26 @@ const deletePrices = (req, res) => {
 
 const deleteSeller = (req, res) => {
   const value = req.body.seller;
+  let productIds;
 
-  db.query(`DELETE FROM sellers WHERE seller_name = ?`, value, (err) => {
+  db.query(`SELECT product_id FROM prices WHERE seller = (SELECT id FROM sellers WHERE seller_name = ?)`, value, (err, result) => {
     if (err) {
-      res.status(500).send(err);
+      res.status(500).send(err)
     } else {
-      res.sendStatus(200);
+      productIds = result.map((id) => { return id.product_id });
+
+      client.del(productIds);
+
+      db.query(`DELETE FROM prices, sellers USING prices INNER JOIN sellers WHERE sellers.seller_name = ? AND prices.seller = sellers.id`, value, (err) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          res.sendStatus(200);
+        }
+      });
     }
-  });
+  })
+
 }
 
 const updatePrices = (req, res) => {
@@ -97,6 +128,7 @@ const updatePrices = (req, res) => {
     if (err) {
       res.status(500).send(err);
     } else {
+      client.del(req.body.productId);
       res.sendStatus(200);
     }
   });
@@ -104,15 +136,25 @@ const updatePrices = (req, res) => {
 
 const updateSeller = (req, res) => {
   const values = [];
+  let productIds;
 
   values.push(req.body.updateValue);
   values.push(req.body.seller);
 
-  db.query(`UPDATE sellers SET ${req.body.updateParam} = ? WHERE seller_name = ?`, values, (err) => {
+  db.query(`SELECT product_id FROM prices WHERE seller = (SELECT id FROM sellers WHERE seller_name = ?)`, req.body.seller, (err, result) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      res.sendStatus(200);
+      productIds = result.map((id) => { return id.product_id });
+      client.del(productIds);
+
+      db.query(`UPDATE sellers SET ${req.body.updateParam} = ? WHERE seller_name = ?`, values, (err) => {
+        if (err) {
+          res.status(500).send(err);
+        } else {
+          res.sendStatus(200);
+        }
+      });
     }
   });
 }
