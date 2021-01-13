@@ -1,5 +1,7 @@
 node_modules
 client/dist/bundle-seller-catalog.js
+client/dist/bundle-seller-catalog.js.gz
+client/dist/bundle-seller-catalog.js.br
 .nyc_output
 .env
 nohup.out
