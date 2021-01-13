@@ -17,7 +17,7 @@ class Options extends React.Component {
 
   componentDidMount() {
     $.ajax({
-      url: 'http://localhost:3002/api/product/quotes',
+      url: `http://localhost:3002/api/product/quotes`,
       method: 'GET',
       data: {
         productId: this.state.productId,

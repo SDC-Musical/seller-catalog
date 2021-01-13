@@ -1,3 +1,6 @@
+const CompressionPlugin = require('compression-webpack-plugin');
+const BrotliPlugin = require('brotli-webpack-plugin');
+
 module.exports = {
   entry: __dirname + '/client/src/index.jsx',
   module: {
@@ -35,4 +38,19 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx', '.css'],
   },
+  plugins: [
+    new CompressionPlugin({
+      filename: 'bundle-seller-catalog.js.gz',
+      algorithm: 'gzip',
+      test: /\.js$|\.css$|\.html$/,
+      threshold: 10240,
+      minRatio: 0.7
+    }),
+    new BrotliPlugin({
+      asset: 'bundle-seller-catalog.js.br',
+      test: /\.js$|\.css$|\.html$/,
+      threshold: 10240,
+      minRatio: 0.7
+    })
+  ],
 };

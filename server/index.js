@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 // eslint-disable-next-line no-unused-vars
 const router = require('./routes');
+const expressStaticGzip = require('express-static-gzip');
 
 const app = express();
 
@@ -15,10 +16,15 @@ app.use(express.urlencoded({ extended: true }));
 const hostname = process.env.HOST;
 const PORT = process.env.PORT;
 
-app.use(express.static(path.join(__dirname, '/../client/dist')));
+
+app.use(expressStaticGzip(path.join(__dirname, '/../client/dist'), {
+  enableBrotli: true,
+  orderPreference: ['br', 'gz']
+}));
 app.use('/:id', express.static(path.join(__dirname, '/../client/dist')));
 
 app.use('/api', router);
+
 
 app.listen(PORT, () => {
   console.log(`App listening at http://${hostname}:${PORT}`);
